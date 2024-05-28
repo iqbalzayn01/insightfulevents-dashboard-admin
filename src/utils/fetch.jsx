@@ -89,17 +89,6 @@ async function getAllUsers() {
   return { error: false, data: responseJson.data };
 }
 
-async function getAllTalents() {
-  const response = await fetchWithToken(`${BASE_URL}/talents`);
-  const responseJson = await response.json();
-
-  if (!response.ok) {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
 async function updateUsers(id, userData) {
   const response = await fetchWithToken(`${BASE_URL}/users/${id}`, {
     method: 'PUT',
@@ -121,6 +110,76 @@ async function updateUsers(id, userData) {
 
 async function deleteUser(id) {
   const response = await fetchWithToken(`${BASE_URL}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const responseJson = await response.json();
+    alert(responseJson.message);
+    return { error: true };
+  }
+
+  return { error: false };
+}
+
+async function createTalents({ name, email, no_telp }) {
+  const response = await fetchWithToken(`${BASE_URL}/create-talents`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      no_telp,
+    }),
+  });
+
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    alert(responseJson.message);
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function getAllTalents() {
+  const response = await fetchWithToken(`${BASE_URL}/talents`);
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function updateTalents(id, talentData) {
+  const response = await fetchWithToken(`${BASE_URL}/talents/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(talentData),
+  });
+
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    alert(responseJson.message);
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function deleteTalent(id) {
+  const response = await fetchWithToken(`${BASE_URL}/talents/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -306,9 +365,13 @@ export {
   signup,
   getUserLogged,
   getAllUsers,
-  getAllTalents,
   updateUsers,
   deleteUser,
+  createTalents,
+  getAllTalents,
+  updateTalents,
+  deleteTalent,
+  //
   createNewThreads,
   getThread,
   upVoteThread,

@@ -1,57 +1,89 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { fetchAllTalents } from '../../redux/talents/actions';
+import {
+  fetchAllTalents,
+  fetchDeleteTalent,
+} from '../../redux/talents/actions';
 
 import Sidebar from '../../components/sidebar';
+import AddTalentModal from './addTalentModal';
 
 export default function DataPembicara() {
   const { talents, error } = useSelector((state) => state.talents);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [selectedTalent, setSelectedTalent] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchAllTalents());
   }, [dispatch]);
 
+  const handleCreateTalent = () => {
+    setIsEdit(false);
+    setSelectedTalent(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (talentData) => {
+    setIsEdit(true);
+    setSelectedTalent(talentData);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    dispatch(fetchDeleteTalent(id));
+  };
+
   return (
-    <div className="flex">
+    <div className="w-full">
       <Sidebar />
-      <main className="ml-64 p-4">
-        <h1 className="text-2xl">Data Pembicara</h1>
+      <main className="ml-64 p-10">
+        <div className="flex items-center justify-between mb-10">
+          <h1 className="text-2xl">Data Pembicara</h1>
+          <button
+            onClick={handleCreateTalent}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Tambah
+          </button>
+        </div>
+        <hr className="mb-4" />
         {error && <p className="text-red-500">Error fetching data: {error}</p>}
         <div className="overflow-x-auto">
           <table className="w-full bg-white">
             <thead>
               <tr>
-                <th className="px-4 py-2">No</th>
-                <th className="px-4 py-2">Nama</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Nomor Telepon</th>
-                <th className="px-4 py-2">Role</th>
-                <th className="px-4 py-2">Actions</th>
+                <th className="text-left px-4 py-2">No</th>
+                <th className="text-left px-4 py-2">Nama</th>
+                <th className="text-left px-4 py-2">Email</th>
+                <th className="text-left px-4 py-2">Nomor Telepon</th>
+                <th className="text-left px-4 py-2">Role</th>
+                <th className="text-left px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {talents &&
                 talents
                   .filter((talent) => talent.role === 'pembicara')
-                  .map((user, index) => (
-                    <tr key={user._id} className="border-t">
+                  .map((talent, index) => (
+                    <tr key={talent._id} className="border-t">
                       <td className="px-4 py-2">{index + 1}</td>
-                      <td className="px-4 py-2">{user.name}</td>
-                      <td className="px-4 py-2">{user.email}</td>
-                      <td className="px-4 py-2">{user.no_telp}</td>
-                      <td className="px-4 py-2">{user.role}</td>
+                      <td className="px-4 py-2">{talent.name}</td>
+                      <td className="px-4 py-2">{talent.email}</td>
+                      <td className="px-4 py-2">{talent.no_telp}</td>
+                      <td className="px-4 py-2">{talent.role}</td>
                       <td className="px-4 py-2">
                         <button
                           className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
-                          //   onClick={() => handleEdit(user._id)}
+                          onClick={() => handleEdit(talent)}
                         >
                           Edit
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded"
-                          //   onClick={() => handleDelete(user._id)}
+                          onClick={() => handleDelete(talent._id)}
                         >
                           Delete
                         </button>
@@ -62,6 +94,13 @@ export default function DataPembicara() {
           </table>
         </div>
       </main>
+      {isModalOpen && (
+        <AddTalentModal
+          onClose={() => setIsModalOpen(false)}
+          isEdit={isEdit}
+          talentData={selectedTalent}
+        />
+      )}
     </div>
   );
 }
