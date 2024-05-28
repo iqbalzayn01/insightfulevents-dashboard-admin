@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { fetchAllUsers, fetchDeleteUser } from '../../redux/users/actions';
 
 import Sidebar from '../../components/sidebar';
+import PopUp from '../../components/popUp';
 import AddUserModal from './addUserModal';
 
 export default function DataUser() {
   const { users, error } = useSelector((state) => state.users);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const dispatch = useDispatch();
@@ -29,8 +31,13 @@ export default function DataUser() {
     setIsModalOpen(true);
   };
 
+  const handlePopUpDelete = () => {
+    setIsPopUpOpen(true);
+  };
+
   const handleDelete = (id) => {
     dispatch(fetchDeleteUser(id));
+    setIsPopUpOpen(false);
   };
 
   return (
@@ -80,10 +87,19 @@ export default function DataUser() {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded"
-                          onClick={() => handleDelete(user._id)}
+                          onClick={handlePopUpDelete}
                         >
-                          Delete
+                          Hapus
                         </button>
+                        {isPopUpOpen && (
+                          <PopUp
+                            handle={() => handleDelete(user._id)}
+                            onClose={() => setIsPopUpOpen(false)}
+                            textPopUp="Apakah anda yakin ingin menghapus data ini?"
+                            classNameBtn="bg-red-500"
+                            textBtn="Hapus"
+                          />
+                        )}
                       </td>
                     </tr>
                   ))}

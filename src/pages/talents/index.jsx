@@ -7,11 +7,13 @@ import {
 } from '../../redux/talents/actions';
 
 import Sidebar from '../../components/sidebar';
+import PopUp from '../../components/popUp';
 import AddTalentModal from './addTalentModal';
 
 export default function DataPembicara() {
   const { talents, error } = useSelector((state) => state.talents);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedTalent, setSelectedTalent] = useState(null);
   const dispatch = useDispatch();
@@ -32,8 +34,13 @@ export default function DataPembicara() {
     setIsModalOpen(true);
   };
 
+  const handlePopUpDelete = () => {
+    setIsPopUpOpen(true);
+  };
+
   const handleDelete = (id) => {
     dispatch(fetchDeleteTalent(id));
+    setIsPopUpOpen(false);
   };
 
   return (
@@ -83,10 +90,19 @@ export default function DataPembicara() {
                         </button>
                         <button
                           className="bg-red-500 text-white px-2 py-1 rounded"
-                          onClick={() => handleDelete(talent._id)}
+                          onClick={handlePopUpDelete}
                         >
-                          Delete
+                          Hapus
                         </button>
+                        {isPopUpOpen && (
+                          <PopUp
+                            handle={() => handleDelete(talent._id)}
+                            onClose={() => setIsPopUpOpen(false)}
+                            textPopUp="Apakah anda yakin ingin menghapus data ini?"
+                            classNameBtn="bg-red-500"
+                            textBtn="Hapus"
+                          />
+                        )}
                       </td>
                     </tr>
                   ))}

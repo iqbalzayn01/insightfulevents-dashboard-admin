@@ -3,11 +3,13 @@ import { loadingBarReducer } from 'react-redux-loading-bar';
 import authReducer from '../auth/reducer';
 import usersReducer from '../users/reducer';
 import talentsReducer from '../talents/reducer';
+import eventsReducer from '../events/reducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   users: usersReducer,
   talents: talentsReducer,
+  events: eventsReducer,
   loadingBar: loadingBarReducer,
 });
 

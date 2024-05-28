@@ -195,103 +195,56 @@ async function deleteTalent(id) {
   return { error: false };
 }
 
-async function createNewThreads({ title, body, category }) {
-  const response = await fetchWithToken(`${BASE_URL}/threads`, {
+async function createEvents({
+  name,
+  description,
+  event_status,
+  location,
+  talentID,
+  price,
+  schedules,
+  linkMeeting,
+}) {
+  const response = await fetchWithToken(`${BASE_URL}/create-events`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ title, body, category }),
+    body: JSON.stringify({
+      name,
+      description,
+      event_status,
+      location,
+      talentID,
+      price,
+      schedules,
+      linkMeeting,
+    }),
   });
 
   const responseJson = await response.json();
 
-  if (responseJson.status !== 'success') {
+  if (!response.ok) {
+    alert(responseJson.message);
     return { error: true, data: null };
   }
 
   return { error: false, data: responseJson.data };
 }
 
-async function getThread(id) {
-  const response = await fetchWithToken(`${BASE_URL}/threads/${id}`);
+async function getAllEvents() {
+  const response = await fetchWithToken(`${BASE_URL}/events`);
   const responseJson = await response.json();
 
-  if (responseJson.status !== 'success') {
+  if (!response.ok) {
     return { error: true, data: null };
   }
 
   return { error: false, data: responseJson.data };
 }
-
-async function upVoteThread(id) {
-  const response = await fetchWithToken(`${BASE_URL}/threads/${id}/up-vote`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function downVoteThread(id) {
-  const response = await fetchWithToken(`${BASE_URL}/threads/${id}/down-vote`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function neutralThreadVote(id) {
-  const response = await fetchWithToken(
-    `${BASE_URL}/threads/${id}/neutral-vote`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function createComment(id, content) {
-  const response = await fetchWithToken(`${BASE_URL}/threads/${id}/comments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ content }),
-  });
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
+//
+//
+//
 async function upVoteComment(id, commentId) {
   const response = await fetchWithToken(
     `${BASE_URL}/threads/${id}/comments/${commentId}/up-vote`,
@@ -349,17 +302,6 @@ async function neutralCommentVote(id, commentId) {
   return { error: false, data: responseJson.data };
 }
 
-async function getLeaderboards() {
-  const response = await fetchWithToken(`${BASE_URL}/leaderboards`);
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
 export {
   login,
   signup,
@@ -371,15 +313,10 @@ export {
   getAllTalents,
   updateTalents,
   deleteTalent,
+  createEvents,
+  getAllEvents,
   //
-  createNewThreads,
-  getThread,
-  upVoteThread,
-  downVoteThread,
-  neutralThreadVote,
-  createComment,
   upVoteComment,
   downVoteComment,
   neutralCommentVote,
-  getLeaderboards,
 };
