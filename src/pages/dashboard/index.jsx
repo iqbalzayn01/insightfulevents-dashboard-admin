@@ -11,25 +11,17 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (getToken) {
-          dispatch(fetchUser());
-        }
-      } catch (error) {
-        console.error('Get One User Error:', error);
-      }
-    };
-
-    fetchData();
-  }, [getToken, dispatch]);
+    if (getUser) {
+      dispatch(fetchUser());
+    }
+  }, [getUser, dispatch]);
 
   return (
     <div className="flex">
       <Sidebar />
-      <main className="ml-64 p-4">
+      <main className="ml-64 p-10">
         <h1 className="text-2xl">Dashboard</h1>
-        <p>Welcome to the admin dashboard!</p>
+        <p className="mb-3">Selamat datang di dashboard admin!</p>
         {getToken && <h1 className="text-2xl">{`Halo, ${getUser.name}`}</h1>}
       </main>
     </div>

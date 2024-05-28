@@ -15,7 +15,7 @@ async function fetchWithToken(url, options = {}) {
 }
 
 async function login({ email, password }) {
-  const response = await fetch(`${BASE_URL}/cms/auth/login`, {
+  const response = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -34,18 +34,32 @@ async function login({ email, password }) {
   return { error: false, data: responseJson.data };
 }
 
-async function register({ name, email, password }) {
-  const response = await fetch(`${BASE_URL}/register`, {
+async function signup({
+  name,
+  email,
+  password,
+  confirmPassword,
+  no_telp,
+  role,
+}) {
+  const response = await fetch(`${BASE_URL}/sign-up`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+      confirmPassword,
+      no_telp,
+      role,
+    }),
   });
 
   const responseJson = await response.json();
 
-  if (responseJson.status !== 'success') {
+  if (!response.ok) {
     alert(responseJson.message);
     return { error: true, data: null };
   }
@@ -54,7 +68,7 @@ async function register({ name, email, password }) {
 }
 
 async function getUserLogged() {
-  const response = await fetchWithToken(`${BASE_URL}/cms/users/me`);
+  const response = await fetchWithToken(`${BASE_URL}/users/me`);
   const responseJson = await response.json();
 
   if (!response.ok) {
@@ -68,11 +82,58 @@ async function getAllUsers() {
   const response = await fetchWithToken(`${BASE_URL}/users`);
   const responseJson = await response.json();
 
-  if (responseJson.status !== 'success') {
+  if (!response.ok) {
     return { error: true, data: null };
   }
 
   return { error: false, data: responseJson.data };
+}
+
+async function getAllTalents() {
+  const response = await fetchWithToken(`${BASE_URL}/talents`);
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function updateUsers(id, userData) {
+  const response = await fetchWithToken(`${BASE_URL}/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    alert(responseJson.message);
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function deleteUser(id) {
+  const response = await fetchWithToken(`${BASE_URL}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const responseJson = await response.json();
+    alert(responseJson.message);
+    return { error: true };
+  }
+
+  return { error: false };
 }
 
 async function createNewThreads({ title, body, category }) {
@@ -84,17 +145,6 @@ async function createNewThreads({ title, body, category }) {
     body: JSON.stringify({ title, body, category }),
   });
 
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function getAllThreads() {
-  const response = await fetchWithToken(`${BASE_URL}/threads`);
   const responseJson = await response.json();
 
   if (responseJson.status !== 'success') {
@@ -253,11 +303,13 @@ async function getLeaderboards() {
 
 export {
   login,
-  register,
+  signup,
   getUserLogged,
   getAllUsers,
+  getAllTalents,
+  updateUsers,
+  deleteUser,
   createNewThreads,
-  getAllThreads,
   getThread,
   upVoteThread,
   downVoteThread,
