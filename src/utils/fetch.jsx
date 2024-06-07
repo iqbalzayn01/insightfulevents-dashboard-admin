@@ -195,14 +195,45 @@ async function deleteTalent(id) {
   return { error: false };
 }
 
+async function getAllSchedules() {
+  const response = await fetchWithToken(`${BASE_URL}/schedules`);
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function createSchedules({ schedules, talentID, eventID }) {
+  const response = await fetchWithToken(`${BASE_URL}/create-schedules`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      schedules,
+      talentID,
+      eventID,
+    }),
+  });
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    alert(responseJson.message);
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
 async function createEvents({
   name,
   description,
   event_status,
   location,
-  talentID,
   price,
-  schedules,
   linkMeeting,
 }) {
   const response = await fetchWithToken(`${BASE_URL}/create-events`, {
@@ -215,9 +246,7 @@ async function createEvents({
       description,
       event_status,
       location,
-      talentID,
       price,
-      schedules,
       linkMeeting,
     }),
   });
@@ -241,6 +270,42 @@ async function getAllEvents() {
   }
 
   return { error: false, data: responseJson.data };
+}
+
+async function updateEvents(id, eventData) {
+  const response = await fetchWithToken(`${BASE_URL}/events/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(eventData),
+  });
+
+  const responseJson = await response.json();
+
+  if (!response.ok) {
+    alert(responseJson.message);
+    return { error: true, data: null };
+  }
+
+  return { error: false, data: responseJson.data };
+}
+
+async function deleteEvent(id) {
+  const response = await fetchWithToken(`${BASE_URL}/events/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const responseJson = await response.json();
+    alert(responseJson.message);
+    return { error: true };
+  }
+
+  return { error: false };
 }
 //
 //
@@ -313,8 +378,12 @@ export {
   getAllTalents,
   updateTalents,
   deleteTalent,
+  getAllSchedules,
+  createSchedules,
   createEvents,
   getAllEvents,
+  updateEvents,
+  deleteEvent,
   //
   upVoteComment,
   downVoteComment,

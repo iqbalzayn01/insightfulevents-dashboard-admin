@@ -70,7 +70,7 @@ export default function DataUser() {
             <tbody>
               {users &&
                 users
-                  .filter((user) => user.role === 'user')
+                  .filter((user) => user.role === 'peserta')
                   .map((user, index) => (
                     <tr key={user._id} className="border-t">
                       <td className="px-4 py-2">{index + 1}</td>

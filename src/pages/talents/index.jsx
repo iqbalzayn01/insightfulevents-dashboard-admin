@@ -10,12 +10,12 @@ import Sidebar from '../../components/sidebar';
 import PopUp from '../../components/popUp';
 import AddTalentModal from './addTalentModal';
 
-export default function DataPembicara() {
+export default function DataNarasumber() {
   const { talents, error } = useSelector((state) => state.talents);
+  const [selectedTalent, setSelectedTalent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [selectedTalent, setSelectedTalent] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function DataPembicara() {
       <Sidebar />
       <main className="ml-64 p-10">
         <div className="flex items-center justify-between mb-10">
-          <h1 className="text-2xl">Data Pembicara</h1>
+          <h1 className="text-2xl">Data Narasumber</h1>
           <button
             onClick={handleCreateTalent}
             className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -73,7 +73,7 @@ export default function DataPembicara() {
             <tbody>
               {talents &&
                 talents
-                  .filter((talent) => talent.role === 'pembicara')
+                  .filter((talent) => talent.role === 'narasumber')
                   .map((talent, index) => (
                     <tr key={talent._id} className="border-t">
                       <td className="px-4 py-2">{index + 1}</td>

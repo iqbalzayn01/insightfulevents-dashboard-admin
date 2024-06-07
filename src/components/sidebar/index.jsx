@@ -36,10 +36,10 @@ export default function Sidebar() {
           <Link to="/data-user">Data User</Link>
         </li>
         <li className="w-full hover:bg-slate-500 px-4 py-4 mb-4">
-          <Link to="/data-pembicara">Data Pembicara</Link>
+          <Link to="/data-narasumber">Data Narasumber</Link>
         </li>
         <li className="w-full hover:bg-slate-500 px-4 py-4 mb-4">
-          <Link to="/data-kegiatan">Data Kegiatan</Link>
+          <Link to="/data-kegiatan">Data Kegiatan Pelatihan</Link>
         </li>
         <li className="w-full hover:bg-slate-500 px-4 py-4 mb-4">
           <Link to="/data-pendaftaran">Data Pendaftaran</Link>
