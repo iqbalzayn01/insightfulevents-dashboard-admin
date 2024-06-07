@@ -3,15 +3,28 @@ import config from '../config';
 const BASE_URL = config.base_url;
 
 async function fetchWithToken(url, options = {}) {
-  const getToken = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
 
-  return fetch(url, {
+  const response = await fetch(url, {
     ...options,
     headers: {
       ...options.headers,
-      Authorization: `Bearer ${getToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
+
+  const responseJson = await response.json();
+
+  if (response.status === 500) {
+    if (responseJson.msg === 'jwt expired') {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+      return Promise.reject(new Error('Token expired'));
+    }
+    return Promise.reject(new Error(responseJson.message || 'Fetch failed'));
+  }
+
+  return responseJson;
 }
 
 async function login({ email, password }) {
@@ -307,65 +320,6 @@ async function deleteEvent(id) {
 
   return { error: false };
 }
-//
-//
-//
-async function upVoteComment(id, commentId) {
-  const response = await fetchWithToken(
-    `${BASE_URL}/threads/${id}/comments/${commentId}/up-vote`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function downVoteComment(id, commentId) {
-  const response = await fetchWithToken(
-    `${BASE_URL}/threads/${id}/comments/${commentId}/down-vote`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
-
-async function neutralCommentVote(id, commentId) {
-  const response = await fetchWithToken(
-    `${BASE_URL}/threads/${id}/comments/${commentId}/neutral-vote`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  const responseJson = await response.json();
-
-  if (responseJson.status !== 'success') {
-    return { error: true, data: null };
-  }
-
-  return { error: false, data: responseJson.data };
-}
 
 export {
   login,
@@ -384,8 +338,4 @@ export {
   getAllEvents,
   updateEvents,
   deleteEvent,
-  //
-  upVoteComment,
-  downVoteComment,
-  neutralCommentVote,
 };
