@@ -1,20 +1,22 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { fetchUser } from '../../redux/auth/actions';
 
 import Sidebar from '../../components/sidebar';
 
 const Dashboard = () => {
+  const [fetchDone, setFetchDone] = useState(false);
   const getToken = useSelector((state) => state.auth.token);
   const getUser = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (getUser) {
+    if (getUser && getToken && !fetchDone) {
       dispatch(fetchUser());
+      setFetchDone(true);
     }
-  }, [getUser, dispatch]);
+  }, [getUser, getToken, fetchDone, dispatch]);
 
   return (
     <div className="flex">

@@ -13,30 +13,6 @@ async function fetchWithToken(url, options = {}) {
     },
   });
 }
-// async function fetchWithToken(url, options = {}) {
-//   const token = localStorage.getItem('token');
-
-//   const response = await fetch(url, {
-//     ...options,
-//     headers: {
-//       ...options.headers,
-//       Authorization: `Bearer ${token}`,
-//     },
-//   });
-
-//   const responseJson = await response.json();
-
-//   if (response.status === 500) {
-//     if (responseJson.msg === 'jwt expired') {
-//       localStorage.removeItem('token');
-//       window.location.href = '/login';
-//       return Promise.reject(new Error('Token expired'));
-//     }
-//     return Promise.reject(new Error(responseJson.message || 'Fetch failed'));
-//   }
-
-//   return responseJson;
-// }
 
 async function login({ email, password }) {
   const response = await fetch(`${BASE_URL}/auth/login`, {
