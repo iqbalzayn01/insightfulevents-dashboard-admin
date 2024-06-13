@@ -1,29 +1,39 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-// import { format } from 'date-fns';
+import { format } from 'date-fns';
 
 import { fetchAllEvents, fetchDeleteEvent } from '../../redux/events/actions';
+import {
+  fetchAllSchedules,
+  fetchDeleteSchedule,
+} from '../../redux/schedules/actions';
 
 import Sidebar from '../../components/sidebar';
 import PopUp from '../../components/popUp';
 import AddEventModal from './addEventModal';
+import AddScheduleModal from './addScheduleModal';
 
 export default function DataKegiatan() {
   const { events, error } = useSelector((state) => state.events);
+  const { schedules } = useSelector((state) => state.schedules);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectEventID, setSelectEventID] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchAllEvents());
+    dispatch(fetchAllSchedules());
   }, [dispatch]);
 
-  // const formatDateTime = (dateTime) => {
-  //   return format(new Date(dateTime), 'dd MMM yyyy, HH:mm');
-  // };
+  const formatDateTime = (dateTime) => {
+    return format(new Date(dateTime), 'dd MMM yyyy, HH:mm');
+  };
 
+  // Events
   const formatPrice = (price) => {
     return price.toLocaleString('id-ID');
   };
@@ -44,8 +54,19 @@ export default function DataKegiatan() {
     setIsPopUpOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDeleteEvent = (id) => {
     dispatch(fetchDeleteEvent(id));
+    setIsPopUpOpen(false);
+  };
+
+  // Schedules
+  const handleCreateSchedule = (eventID) => {
+    setSelectEventID(eventID);
+    setScheduleOpen(true);
+  };
+
+  const handleDeleteSchedule = (id) => {
+    dispatch(fetchDeleteSchedule(id));
     setIsPopUpOpen(false);
   };
 
@@ -76,7 +97,14 @@ export default function DataKegiatan() {
                     <h2 className="text-2xl font-medium">{event.name}</h2>
                     <hr />
                     <p>{event.description}</p>
-                    <p>Talent:</p>
+                    {schedules &&
+                      schedules
+                        .filter(
+                          (schedule) => schedule.eventID._id === event._id
+                        )
+                        .map((schedule, index) => (
+                          <p key={index}>Talent: {schedule.talentID.name}</p>
+                        ))}
                     <p>Link: {event.linkMeeting}</p>
                     <div className="flex flex-col gap-2">
                       <p className="font-semibold">Lokasi:</p>
@@ -84,14 +112,66 @@ export default function DataKegiatan() {
                     </div>
                     <div className="flex flex-col">
                       <p className="font-semibold">Jadwal:</p>
+                      <button
+                        className="bg-emerald-500 text-white px-2 py-1 rounded"
+                        onClick={() => handleCreateSchedule(event._id)}
+                      >
+                        Atur Jadwal
+                      </button>
+                      {schedules &&
+                        schedules
+                          .filter(
+                            (schedule) => schedule.eventID._id === event._id
+                          )
+                          .map((schedule, index) => (
+                            <div key={index}>
+                              <div>
+                                {schedule.schedules.map((time, subIndex) => (
+                                  <div key={subIndex}>
+                                    <p>
+                                      mulai: {formatDateTime(time.start_time)}
+                                    </p>
+                                    <p>
+                                      selesai: {formatDateTime(time.end_time)}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {/*  */}
+                                <button
+                                  className="bg-red-500 text-white px-2 py-1 rounded"
+                                  onClick={() =>
+                                    handleDeleteSchedule(schedule._id)
+                                  }
+                                >
+                                  Hapus
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                      {scheduleOpen && (
+                        <AddScheduleModal
+                          onClose={() => setScheduleOpen(false)}
+                          isEdit={isEdit}
+                          eventID={selectEventID}
+                        />
+                      )}
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className="bg-emerald-500 text-white font-medium px-3 py-2 rounded-lg">
-                        {event.event_status}
-                      </p>
-                      <p className="font-semibold">
-                        Rp. {formatPrice(event.price)}
-                      </p>
+
+                    <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-2">
+                        <p className="font-semibold">Status Kegiatan:</p>
+                        <p className="bg-emerald-500 text-white text-center font-medium uppercase px-3 py-2 rounded-lg">
+                          {event.event_status}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="font-semibold">Harga:</p>
+                        <p className="text-xl">
+                          Rp. {formatPrice(event.price)}
+                        </p>
+                      </div>
                     </div>
                     <hr className="bg-slate-400" />
                     <div className="flex items-center gap-2">
@@ -109,7 +189,7 @@ export default function DataKegiatan() {
                       </button>
                       {isPopUpOpen && (
                         <PopUp
-                          handle={() => handleDelete(event._id)}
+                          handle={() => handleDeleteEvent(event._id)}
                           onClose={() => setIsPopUpOpen(false)}
                           textPopUp="Apakah anda yakin ingin menghapus data ini?"
                           classNameBtn="bg-red-500"

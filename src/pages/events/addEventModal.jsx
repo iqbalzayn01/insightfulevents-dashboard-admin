@@ -9,10 +9,10 @@ export default function AddEventModal({ onClose, isEdit, eventData }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    event_status: 'offline',
+    event_status: '',
     location: '',
     price: '',
-    linkMeeting: '',
+    linkMeeting: '-',
   });
   const dispatch = useDispatch();
 
@@ -49,7 +49,7 @@ export default function AddEventModal({ onClose, isEdit, eventData }) {
 
   return (
     <div className="fixed inset-0 overflow-y-auto flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-1/3">
+      <div className="bg-white p-8 rounded-lg shadow-md w-1/2">
         <h2 className="text-xl mb-4">
           {isEdit ? 'Edit Event' : 'Tambah Event Baru'}
         </h2>
@@ -101,12 +101,13 @@ export default function AddEventModal({ onClose, isEdit, eventData }) {
           <div className="mb-4">
             <label className="block mb-1">Status Event</label>
             <select
-              name="eventStatus"
-              value={formData.eventStatus}
+              name="event_status"
+              value={formData.event_status}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
             >
+              <option value="">Pilih Status</option>
               <option value="online">Online</option>
               <option value="offline">Offline</option>
             </select>

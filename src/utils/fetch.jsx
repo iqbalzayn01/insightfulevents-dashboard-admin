@@ -72,11 +72,30 @@ async function getUserLogged() {
   const responseJson = await response.json();
 
   if (!response.ok) {
-    return { error: true, data: null };
+    if (response.status === 500 && responseJson.msg === 'jwt expired') {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+      return { error: true, data: null, message: 'Token expired' };
+    }
+    return {
+      error: true,
+      data: null,
+      message: responseJson.msg || 'Fetch failed',
+    };
   }
 
   return { error: false, data: responseJson.data };
 }
+// async function getUserLogged() {
+//   const response = await fetchWithToken(`${BASE_URL}/users/me`);
+//   const responseJson = await response.json();
+
+//   if (!response.ok) {
+//     return { error: true, data: null };
+//   }
+
+//   return { error: false, data: responseJson.data };
+// }
 
 async function getAllUsers() {
   const response = await fetchWithToken(`${BASE_URL}/users`);
@@ -228,6 +247,23 @@ async function createSchedules({ schedules, talentID, eventID }) {
   return { error: false, data: responseJson.data };
 }
 
+async function deleteSchedules(id) {
+  const response = await fetchWithToken(`${BASE_URL}/schedules/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const responseJson = await response.json();
+    alert(responseJson.message);
+    return { error: true };
+  }
+
+  return { error: false };
+}
+
 async function createEvents({
   name,
   description,
@@ -321,6 +357,7 @@ export {
   deleteTalent,
   getAllSchedules,
   createSchedules,
+  deleteSchedules,
   createEvents,
   getAllEvents,
   updateEvents,

@@ -1,5 +1,9 @@
 import { createAction } from '@reduxjs/toolkit';
-import { getAllSchedules, createSchedules } from '../../utils/fetch';
+import {
+  getAllSchedules,
+  createSchedules,
+  deleteSchedules,
+} from '../../utils/fetch';
 
 export const setSchedules = createAction('schedules/setSchedules');
 export const setOneSchedule = createAction('schedules/setOneSchedule');
@@ -17,13 +21,21 @@ export const fetchAllSchedules = () => async (dispatch) => {
   }
 };
 
-export const fetchCreateSchedule = () => async (dispatch) => {
+export const fetchCreateSchedule = (scheduleData) => async (dispatch) => {
   try {
-    const res = await createSchedules();
+    const res = await createSchedules(scheduleData);
     const dataSchedules = res.data;
-    console.log('TEST SCHEDULES', dataSchedules);
     dispatch(createSchedule(dataSchedules));
   } catch (error) {
     console.error('Create Schedules Error:', error);
+  }
+};
+
+export const fetchDeleteSchedule = (id) => async (dispatch) => {
+  try {
+    await deleteSchedules(id);
+    dispatch(removeSchedule(id));
+  } catch (error) {
+    console.error('Delete Schedules Error:', error);
   }
 };
